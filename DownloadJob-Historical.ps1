@@ -64,7 +64,7 @@ try
 						$ProgressPreference='Continue’
 
 						$DecompressedFileName = $dir.path + "\" + $job.title + "-files.txt"
-						$returnValue = $DecomressedFileName
+						$returnValue = $DecompressedFileName
 
 						#make sure to start with a blank file
 						#Delete filelist file if it exists, suppress error if it doesn't
