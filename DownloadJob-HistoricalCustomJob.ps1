@@ -13,7 +13,10 @@ param (
     [bool]$clean=$false,
     
     [Parameter(Position=5)]
-    [bool]$combine=$false
+    [bool]$combine=$false,
+
+    [Parameter(Position=6)]
+    [int]$StartAt=0
  )
 
 
@@ -22,7 +25,7 @@ param (
 
 [void][System.Reflection.Assembly]::LoadWithPartialName("System.Web.Extensions")        
 $jsonserial= New-Object -TypeName System.Web.Script.Serialization.JavaScriptSerializer 
-$jsonserial.MaxJsonLength  = 67108864
+$jsonserial.MaxJsonLength  = 7000000
 
 $dir = pwd
 
@@ -40,12 +43,20 @@ try
 	Write-Host "Getting File List"
 	$fileListRaw = Invoke-RestMethod -Uri $jobURL -Method Get -Credential $cred -ContentType "application/json"
 	Write-Host "Finished getting File List"
-	
+
+	#1 ) Uncomment out the line below to use JavaScript Deserializer
 	$fileList = $jsonserial.DeserializeObject($fileListRaw)
 
-	$fileCount = $fileList.urlList.Count
+	# $fileListJson = ConvertTo-Json $fileListRaw
+	# $fileListJson.expiresAt
+	
+	
+	# 2) comment the line below to use JavaScript deserializer.
+	# $fileList = $fileListRaw
 
+	$fileCount = $fileList.urlList.Count
 	$DecompressedFileName = $dir.path + "\" + $title + "-files.txt"
+	
 	$returnValue = $DecompressedFileName
 
 	#make sure to start with a blank file
@@ -60,13 +71,17 @@ try
 	foreach ($file in $fileList.urlList)
 	{
 		$fileNumber++
-		$fileNumberString = "000000" + $fileNumber 
-		$fileNumberString = $fileNumberString.Substring($fileNumberString.Length-6,6)
-		$destFile = $title + "-file" + $fileNumberString + ".json.gz"
-		Write-Progress -Activity "Downloading files" -status $destFile -percentComplete ($fileNumber / $fileCount*100) -Id 1
-		$ProgressPreference=’SilentlyContinue’
-		Invoke-WebRequest $file -OutFile $destFile
-		$ProgressPreference='Continue’
+		# handle skipping files already downloaded.
+		if ($fileNumber -ge $startAt) 
+		{
+			$fileNumberString = "000000" + $fileNumber 
+			$fileNumberString = $fileNumberString.Substring($fileNumberString.Length-6,6)
+			$destFile = $title + "-file" + $fileNumberString + ".json.gz"
+			Write-Progress -Activity "Downloading files" -status $destFile -percentComplete ($fileNumber / $fileCount*100) -Id 1
+			$ProgressPreference=’SilentlyContinue’
+			Invoke-WebRequest $file -OutFile $destFile
+			$ProgressPreference='Continue’
+		}
 	 }
 	Write-Progress -Activity "Downloading files" -Completed -Id 1
 		
