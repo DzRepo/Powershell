@@ -22,10 +22,9 @@ param (
 
 . "./gzip.ps1"
 
-
 [void][System.Reflection.Assembly]::LoadWithPartialName("System.Web.Extensions")        
 $jsonserial= New-Object -TypeName System.Web.Script.Serialization.JavaScriptSerializer 
-$jsonserial.MaxJsonLength  = 7000000
+$jsonserial.MaxJsonLength  = 201520970
 
 $dir = pwd
 
@@ -47,6 +46,7 @@ try
 	#1 ) Uncomment out the line below to use JavaScript Deserializer
 	$fileList = $jsonserial.DeserializeObject($fileListRaw)
 
+	# 
 	# $fileListJson = ConvertTo-Json $fileListRaw
 	# $fileListJson.expiresAt
 	
