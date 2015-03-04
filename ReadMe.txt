@@ -2,6 +2,9 @@ CreateJob-Historical - Creates new Historical Powertrack job
 GetJobs-Historical - Retrieves status of existing jobs
 UpdateJob-Historical - Accepts or rejects submitted jobs
 DownloadJob-Historical - Downloads and optionally decompresses and concatanates the individual files into a single Json file
+DownloadJob-HistoricalCustomJob - Download and optionally decompresses and concatenates files from a custom HPT job
+Create-CombinedCsv - Takes a combined file (from the download script) and creates a CSV file of specifc fields.
+
 
 Common Parameters for all Scripts:
 
@@ -102,4 +105,16 @@ DownloadJob-HistoricalCustomJob - Downloads and optionally decompresses and conc
 		string   - Filename of either file list of downloaded files, or filename of combined
 			   files, depending on switch used.
 
+=====================================================================================================
+
+Create-CombinedCsv - Takes a combined file (from the download script) and creates a CSV file of specifc fields.
+
+	Parameters:
+		filename - name of combined file name created by Download script
+
+	By default, creates CSV file called "combined.csv"
+	Fields created by default:
+		id, actor.displayName, link, body, twitter_lang, postedTime
+		To change or add fields, open the script with a text editor and follow directions.
+	
 =====================================================================================================
