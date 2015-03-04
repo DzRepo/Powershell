@@ -110,7 +110,8 @@ DownloadJob-HistoricalCustomJob - Downloads and optionally decompresses and conc
 Create-CombinedCsv - Takes a combined file (from the download script) and creates a CSV file of specifc fields.
 
 	Parameters:
-		filename - name of combined file name created by Download script
+		filename - name of combined file name created by Download script 
+			   (enclose in quotes if there are spaces in the filename)
 
 	By default, creates CSV file called "combined.csv"
 	Fields created by default:
