@@ -21,6 +21,11 @@ param (
 
 . "./gzip.ps1"
 
+
+[void][System.Reflection.Assembly]::LoadWithPartialName("System.Web.Extensions")        
+$jsonserial= New-Object -TypeName System.Web.Script.Serialization.JavaScriptSerializer 
+$jsonserial.MaxJsonLength  = 201520970
+
 $dir = pwd
 
 $secpasswd = ConvertTo-SecureString $password -AsPlainText -Force
@@ -34,13 +39,16 @@ $returnValue = ""
 try
 {
 	$ProgressPreference=’SilentlyContinue’
-	$result = Invoke-RestMethod -Uri $url -Method Get -Credential $cred -ContentType "application/json"
+	$resultRaw = Invoke-RestMethod -Uri $url -Method Get -Credential $cred -ContentType "application/json"
 	$ProgressPreference='Continue’
+	$Result = $resultRaw
+	Write-host "Job found: " $Result.jobs[0].title
+	
 
 	foreach ($obj in $Result){ 
 		foreach ($job in $obj.Jobs)
 		{
-			if ($job.title -eq $title) 
+			if ($job.title -eq $title) 		
 			{
 				write-verbose "Title: $job.title"
 
@@ -54,6 +62,7 @@ try
 						$ProgressPreference=’SilentlyContinue’	
 						$JobResult = Invoke-RestMethod -Uri $jobURL -Method Get -Credential $cred -ContentType "application/json"
 						$ProgressPreference='Continue’
+
 						$JobResultsDetail = $JobResult.results
 
 						write-host "Number of Activities: "  $JobResultsDetail.activityCount
@@ -62,7 +71,7 @@ try
 						$ProgressPreference=’SilentlyContinue’
 						$fileList = Invoke-RestMethod -Uri $jobResultsDetail.dataURL -Method Get -Credential $cred -ContentType "application/json"
 						$ProgressPreference='Continue’
-
+												
 						$DecompressedFileName = $dir.path + "\" + $job.title + "-files.txt"
 						$returnValue = $DecompressedFileName
 
@@ -96,8 +105,8 @@ try
 							$sourceFile = $destFile + ".gz"
 							Write-Progress -Activity "Decompressing files" -status $destFile -percentComplete ($fileNumber / $JobResultsDetail.fileCount*100) -Id 1
 							DeGzip-File $sourceFile $destFile
-							$LogFileName = $destFile
-							Add-Content $DecompressedFileName  $LogFileName
+							$LogFileName = '"' + $destFile + '"'
+							Add-Content  $DecompressedFileName $LogFileName
 							
 							if ($clean) { remove-item $sourceFile }
 						}
@@ -150,4 +159,4 @@ catch [System.Net.WebException],[System.Exception]
 {
 	write-host "Error retrieving job information: " $_
 }
-
+	
