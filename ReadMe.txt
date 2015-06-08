@@ -1,9 +1,14 @@
+Historical Powertrack Scripts
 CreateJob-Historical - Creates new Historical Powertrack job
 GetJobs-Historical - Retrieves status of existing jobs
 UpdateJob-Historical - Accepts or rejects submitted jobs
 DownloadJob-Historical - Downloads and optionally decompresses and concatanates the individual files into a single Json file
 DownloadJob-HistoricalCustomJob - Download and optionally decompresses and concatenates files from a custom HPT job
 Create-CombinedCsv - Takes a combined file (from the download script) and creates a CSV file of specifc fields.
+
+Powertrack Stream Scripts
+AddRule-PowerTrack - Add new rule to existing Powertrack stream
+GetRules-PowerTrack - download existing rules from Powertrack stream
 
 
 Common Parameters for all Scripts:
@@ -118,4 +123,28 @@ Create-CombinedCsv - Takes a combined file (from the download script) and create
 		id, actor.displayName, link, body, twitter_lang, postedTime
 		To change or add fields, open the script with a text editor and follow directions.
 	
+=====================================================================================================
+PowerTrack scripts
+=====================================================================================================
+
+AddRule-Powertrack - Adds new rule to Powertrack stream
+	Parameters:
+		account  	- see above
+		username 	- see above
+		password  	- see above
+		streamname  - see above
+		value	    - rule value - "(cats OR dogs) -(puppies OR kittens)"
+		tag  		- [Optional] - tag associated with rule
+		
+=====================================================================================================
+
+GetRules-Powertrack - Adds new rule to Powertrack stream
+	Parameters:
+		account  	- see above
+		username 	- see above
+		password  	- see above
+		streamname  - see above
+		
+	Returns a JSON formatted list of current rules.  Can be modified to return pure PowerShell
+	objects by removing/commenting out "convertto-json" formatting in script.
 =====================================================================================================
