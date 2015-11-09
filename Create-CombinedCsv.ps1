@@ -1,49 +1,86 @@
 [CmdletBinding()] 
 param (
     [Parameter(Mandatory=$True, Position=1)]
-    [string]$filename
+    [string]$ActivityFile,
+    [Parameter(Mandatory=$True, Position=2)]
+    [string]$CSVFile
  )
 
+$ActivityFilePath = $PSScriptRoot + "\" + $ActivityFile
+$CSVFilePath = $PSScriptRoot + "\" + $CSVFile
 
-$fileContents = Get-Content $filename
+$fileInfo = Get-Item $ActivityFilePath
+$ActivityFileSize = $fileInfo.length
 
-# To change or add fields, first change this class declaration:
-# notice the format is "public type name;"
+$quote =  """"
+$comma = ","
 
-Add-Type -Language CSharp @"
-public class NewActivity{
-	public string id;
-	public string displayName;
-	public string link;
-	public string body;
-	public string twitter_lang;
-	public System.DateTime postedTime;
-}
-"@;
+$bytesRead = 0
 
 
-$allrows=@()
-
-$rowNumber = 0
-	 					
-foreach ($row in $fileContents)
+try
 {
-	$rowNumber++
-	Write-Progress -Activity "Exporting Records to Combined.csv" -status $rowNumber -percentComplete ($rowNumber / $fileContents.length*100) -Id 1
-	$obj = $row | ConvertFrom-Json 	
-	$newActivity = new-object NewActivity
+	# Add references for HttpUtility
+	Add-Type -AssemblyName  System.Web
 
-# To add or change fields, next edit or add rows below to copy data from $obj to $newActivity fields defined above.
-# Notice how the actor sub-object is referenced (for displayName).
-# See http://support.gnip.com/sources/twitter/data_format.html#TweetActivities for full definition of activity object
+	$reader = [System.IO.File]::OpenText($ActivityFilePath)
+	$writer = [System.IO.File]::CreateText($CSVFilePath)
+	$Encode = [System.Web.HttpUtility]::UrlEncode($URL) 
 
-	$newActivity.id = $obj.id 
-	$newActivity.displayName = $obj.actor.displayName
-	$newActivity.link = $obj.link
-	$newActivity.body = $obj.body
-	$newActivity.twitter_lang = $obj.twitter_lang
-	$newActivity.postedTime = $obj.postedTime
-	$allrows += $newActivity
+	 # $index = 0
+
+	for(;;) {
+	    	$line = $reader.ReadLine()
+   	 	if ($line -eq $null) { break }
+ 	   	
+		# process the line
+ 	   	$bytesRead += $line.Length
+ 	   	$obj = ConvertFrom-Json $line
+    
+ 	   	# create a blank polygon array to eliminate nulls
+ 	   	$geo = @("","","","","","","","","","")
+	
+    		$location = $obj.location
+    		
+		if ($location -ne $null) {
+			$geo = $location.geo.coordinates
+    		}
+    	
+    		Write-Progress -Activity "Export to CSV" -status $bytesRead -percentComplete ($bytesRead / $ActivityFileSize) -Id 1
+    
+    		$writer.WriteLine(
+			$quote + $obj.id + $quote  + $comma +
+			$quote + $obj.body + $quote + $comma + 
+			$quote + $obj.twitter_lang + $quote + $comma + 
+			$obj.postedTime + $comma + 
+			$quote + $location.geo.type + $quote + $comma +
+			$geo[0][0] + $comma +
+			$geo[0][1] + $comma +
+			$geo[0][2] + $comma +
+			$geo[0][3] + $comma +
+			$geo[0][4] + $comma +
+			$geo[0][5] + $comma +
+			$geo[0][6] + $comma +
+			$geo[0][7] 
+		)
+
+		# $index +=1
+		# if ( $index -gt 100 ) { break }
+	}
+
 }
-
-$allrows | Export-Csv "combined.csv"
+catch [System.Net.WebException],[System.Exception]
+{
+	$ex = $_
+	write-host -foregroundcolor Red "Error exporting to CSV: " -nonewline
+	write-host -foregroundcolor Yellow $_
+	write-host -foregroundcolor Red "Line number:" -nonewline
+	write-host -foregroundcolor Yellow $ex.InvocationInfo.ScriptLineNumber
+}
+try
+{
+	$writer.Close();
+	$reader.Close()
+}
+catch [System.Exception]
+{}
