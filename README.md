@@ -112,9 +112,7 @@ PowerShell array of 'JobStatus' objects, defined as
 * *integer*  **activityCount** - number of activities found for completed job
 * *integer*  **fileCount** - number of files for completed job
 * *DateTime* **expiresAt** - date/time the files will be deleted
-* 
 #_______________________________________________
-
 **UpdateJob-Historical** - Accepts or rejects submitted jobs
 
 *Parameters:*
