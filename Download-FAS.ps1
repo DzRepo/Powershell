@@ -20,11 +20,14 @@ param (
 
     [Parameter(Position=7)]
     [int]$maxRecords = -1,
-    
+
     [Parameter(Position=8)]
-    [string]$fromDate=$null,
+    [string]$bucket="day",
     
     [Parameter(Position=9)]
+    [string]$fromDate=$null,
+    
+    [Parameter(Position=10)]
     [string]$toDate=$null
 )
 
@@ -58,16 +61,14 @@ $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0
 if ($querytype.ToLower() -eq "data")
 {
     $body = @{ query = $query; maxResults = $maxResults }
-
-    if ($fromDate.Length -ne 0) { $body["fromDate"] = $fromDate}
-    if ($toDate.Length -ne 0) { $body["toDate"] = $toDate}
 }
 else
 {
-    $body = @{ query = $query }
-    if ($fromDate.Length -ne 0) { $body["fromDate"] = $fromDate}
-    if ($toDate.Length -ne 0) { $body["toDate"] = $toDate}
+    $body = @{ query = $query; bucket = $bucket }
 }   
+
+if ($fromDate.Length -ne 0) { $body["fromDate"] = $fromDate}
+if ($toDate.Length -ne 0) { $body["toDate"] = $toDate}
 
 # $returnValue = ""
 $TotalRecords = 0
@@ -85,7 +86,6 @@ try
         {
             $TotalRecords += 1
             $allResults += $resultRow 
-  
             if (($TotalRecords -ge $maxRecords) -and ($maxRecords -gt 0)) {
                 $Stop = $True
                 break 
@@ -97,9 +97,7 @@ try
         }
         else
         {
-            $body = @{ query = $query; maxResults = $maxResults; next = $Result.next }
-            if ($fromDate.Length -ne 0) { $body["fromDate"] = $fromDate}
-            if ($toDate.Length -ne 0) { $body["toDate"] = $toDate}
+            $body["next"] = $Result.next
         }
     }
 
