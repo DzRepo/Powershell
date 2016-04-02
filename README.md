@@ -56,6 +56,7 @@ is functionally the same as
 * **query** - PowerTrack rule (escape delimited if necessary)
 * **queryType** - "data" or "counts"
 * **MaxRecords** - total number of records to return - use -1 for "all"
+* **bucket** - for counts - day, hour or second
 * **fromDate** - start date/time in UNC for search
 * **toDate** - end date/time in UNC for search
 
@@ -64,9 +65,9 @@ is functionally the same as
 * *json* - Json object of results matching query or with count data
 
 *Examples*
-.\Download-FAS.ps1 ACCOUNT USERNAME PASSWORD LABEL "QUERY" data|counts -1 "YYYYMMDDHHMM" > FileName.json
+.\Download-FAS.ps1 ACCOUNT USERNAME PASSWORD LABEL "QUERY" data|counts -1 day "YYYYMMDDHHMM" > FileName.json
 
-.\Download-FAS.ps1 ACCOUNT USERNAME PASSWORD LABEL "QUERY" counts "FROMDATETIME" "TODATETIME > FileName.json
+.\Download-FAS.ps1 ACCOUNT USERNAME PASSWORD LABEL "QUERY" counts -1 day "FROMDATETIME" "TODATETIME" > FileName.json
 
 #_______________________________________________
 
