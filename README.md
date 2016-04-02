@@ -1,5 +1,8 @@
 # Powershell Utilities for working with the Gnip / Twitter Data API
 
+_Full Archive Search_
+**Download-FAS** Download data from Full Archive Search
+
 _Historical Powertrack Scripts_
 
 **CreateJob-Historical** - Creates new Historical Powertrack job
@@ -19,7 +22,7 @@ _Historical Powertrack Scripts_
 **AddRule-PowerTrack** - Add new rule to existing Powertrack stream
 
 **GetRules-PowerTrack** - download existing rules from Powertrack stream
-#________________________________________________________________
+#____________________________________________________
 
 *Common Parameters for all Scripts:*
 
@@ -41,7 +44,29 @@ is functionally the same as
 
 `GetJobs-Historical "MyAccount" "myname@domain.com" "5up3r53cr3t!"`
 
-#=====================================================================================================
+#____________________________________________________
+**Download-FAS** - Download data or counts from Full Archive Search
+*Parameters:*
+
+* **account** - see above
+* **username** - see above
+* **password** - see above
+* **label** - typically "prod", available in the console
+* **query** - PowerTrack rule (escape delimited if necessary)
+* **queryType** - "data" or "counts"
+* **MaxRecords** - total number of records to return - use -1 for "all"
+* **fromDate** - start date/time in UNC for search
+* **toDate** - end date/time in UNC for search
+
+*Returns*
+
+* *json* - Json object of results matching query or with count data
+
+*Examples*
+.\Download-FAS.ps1 ACCOUNT USERNAME PASSWORD LABEL "QUERY" data|counts -1 "YYYYMMDDHHMM" > FileName.json
+.\Download-FAS.ps1 ACCOUNT USERNAME PASSWORD LABEL "QUERY" counts "FROMDATETIME" "TODATETIME > FileName.json
+
+#____________________________________________________
 
 **CreateJob-Historical** - Creates new Historical Powertrack job
 
@@ -59,7 +84,7 @@ is functionally the same as
 
 * *string* - Status message returned by submission
 
-#=====================================================================================================
+#____________________________________________________
 
 **GetJobs-Historical** - Retrieves status of existing jobs
 
@@ -86,7 +111,7 @@ PowerShell array of 'JobStatus' objects, defined as
 * *integer*  **fileCount** - number of files for completed job
 * *DateTime* **expiresAt** - date/time the files will be deleted
 
-#=====================================================================================================
+#____________________________________________________
 
 **UpdateJob-Historical** - Accepts or rejects submitted jobs
 
@@ -102,7 +127,7 @@ PowerShell array of 'JobStatus' objects, defined as
 
 * **string** - Status message returned by submission
 
-#=====================================================================================================
+#____________________________________________________
 
 **DownloadJob-Historical** - Downloads and optionally decompresses and concatanates the individual files into a single Json file
 
@@ -121,7 +146,7 @@ PowerShell array of 'JobStatus' objects, defined as
 
 * **string**   - Filename of either file list of downloaded files, or filename of combined files, depending on switch used.
 
-#=====================================================================================================
+#____________________________________________________
 
 **DownloadJob-HistoricalCustomJob** - Downloads and optionally decompresses and concatanates the individual files of a custom HPT job into a single Json file
 
@@ -135,13 +160,14 @@ PowerShell array of 'JobStatus' objects, defined as
 	- Defaults to *$false*
 * **combine**  - *Optional* ($true or $false) creates single file with all activities in it, and remove individual .json files
 	* Defaults to $false
-* **startAt**  - start downloading at file#  (used to restart stalled jobs)
+
+* **startAt**  - start downloading at file#  (used to restart stalled jobs)
 
 *Returns:*
 
 * string   - Filename of either file list of downloaded files, or filename of combined files, depending on switch used.
 
-#=====================================================================================================
+#____________________________________________________
 
 **Create-CombinedCsv** - Takes a combined file (from the download script) and creates a CSV file of specifc fields.
 
@@ -155,9 +181,9 @@ PowerShell array of 'JobStatus' objects, defined as
 By default, creates CSV file called "combined.csv"
 
 **To change or add fields, open the script with a text editor and follow directions in file.**	
-#=====================================================================================================
+#____________________________________________________
 *PowerTrack Stream scripts*
-#=====================================================================================================
+#____________________________________________________
 
 **AddRule-Powertrack** - Adds new rule to Powertrack stream
 
@@ -170,7 +196,7 @@ By default, creates CSV file called "combined.csv"
 * **value**	    - rule value - "(cats OR dogs) -(puppies OR kittens)"
 * **tag**  		- [Optional] - tag associated with rule
 
-#=====================================================================================================
+#____________________________________________________
 
 **GetRules-Powertrack** - Adds new rule to Powertrack stream
 
@@ -185,4 +211,4 @@ By default, creates CSV file called "combined.csv"
 
 A JSON formatted list of current rules.  Can be modified to return pure PowerShell
 	objects by removing/commenting out "convertto-json" formatting in script.
-#=====================================================================================================
+#____________________________________________________
